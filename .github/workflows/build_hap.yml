@@ -77,11 +77,15 @@ jobs:
 
       - name: Setup OpenHarmony SDK environment
         run: |
-          echo "OHOS_SDK_HOME=$HOME/harmonyos-sdk" >> $GITHUB_ENV
-          echo "OHOS_BASE_SDK_HOME=$HOME/harmonyos-sdk" >> $GITHUB_ENV
-          echo "HOS_SDK_HOME=$HOME/harmonyos-sdk" >> $GITHUB_ENV
-          # 添加 hdc 到 PATH
+          # 设置 SDK 根目录
+          echo "OHOS_SDK_HOME=$HOME/harmonyos-sdk/linux" >> $GITHUB_ENV
+          echo "OHOS_BASE_SDK_HOME=$HOME/harmonyos-sdk/linux" >> $GITHUB_ENV
+          echo "HOS_SDK_HOME=$HOME/harmonyos-sdk/linux" >> $GITHUB_ENV
+          # 添加 hdc 调试工具
           echo "$HOME/harmonyos-sdk/linux/toolchains" >> $GITHUB_PATH
+          # 添加 Native 编译器 (clang, cmake等)
+          echo "$HOME/harmonyos-sdk/linux/native/build-tools/cmake/bin" >> $GITHUB_PATH
+          echo "$HOME/harmonyos-sdk/linux/native/llvm/bin" >> $GITHUB_PATH
 
       - name: Setup Flutter SDK (OpenHarmony)
         run: |
@@ -94,8 +98,13 @@ jobs:
           echo "---"
           echo "OHOS_SDK_HOME=$OHOS_SDK_HOME"
           echo "HOS_SDK_HOME=$HOS_SDK_HOME"
-          ls -la ~/harmonyos-sdk/linux/
-          which hdc 2>/dev/null && hdc --version 2>/dev/null || echo "hdc not in PATH yet"
+          echo "---"
+          echo "=== Check hdc ==="
+          which hdc 2>/dev/null && hdc --version 2>/dev/null || echo "hdc not in PATH"
+          echo "=== Check cmake ==="
+          which cmake 2>/dev/null && cmake --version 2>/dev/null | head -1 || echo "cmake not in PATH"
+          echo "=== Check clang ==="
+          which clang 2>/dev/null && clang --version 2>/dev/null | head -1 || echo "clang not in PATH"
 
       - name: Install dependencies
         working-directory: app
