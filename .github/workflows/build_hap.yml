@@ -31,7 +31,7 @@ jobs:
 
       - name: Add OpenHarmony Flutter support
         run: |
-          git clone https://gitcode.com/openharmony-sig/flutter_ohos.git --depth 1
+          git clone https://gitcode.com/CPF-Flutter/flutter_flutter.git --depth 1
           cd flutter_ohos
           ./flutter/tools/gn --ohos --unoptimized
           ./flutter/tools/ninja -C out/ohos_unopt
