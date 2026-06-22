@@ -37,10 +37,10 @@ jobs:
 
       - name: Setup OpenHarmony SDK environment
         run: |
-          # 设置 SDK 环境变量
-          echo "OHOS_SDK_HOME=${{ steps.setup-ohos-sdk.outputs.ohos_sdk_native }}" >> $GITHUB_ENV
-          echo "OHOS_BASE_SDK_HOME=${{ steps.setup-ohos-sdk.outputs.ohos_sdk_native }}" >> $GITHUB_ENV
-          echo "HOS_SDK_HOME=${{ steps.setup-ohos-sdk.outputs.ohos_sdk_native }}" >> $GITHUB_ENV
+          # setup-ohos-sdk 已设置 OHOS_BASE_SDK_HOME 和 OHOS_NDK_HOME
+          # Flutter 鸿蒙版需要 HOS_SDK_HOME
+          echo "HOS_SDK_HOME=$OHOS_BASE_SDK_HOME" >> $GITHUB_ENV
+          echo "OHOS_SDK_HOME=$OHOS_BASE_SDK_HOME" >> $GITHUB_ENV
 
       - name: Setup Flutter SDK (OpenHarmony)
         run: |
