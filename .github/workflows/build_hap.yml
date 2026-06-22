@@ -10,7 +10,7 @@ on:
 jobs:
   build-hap:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 120
 
     steps:
       - name: Checkout code
@@ -27,69 +27,75 @@ jobs:
         with:
           node-version: 22
 
-      - name: Cache HarmonyOS SDK
+      - name: Cache OpenHarmony SDK
         id: cache-sdk
         uses: actions/cache@v4
         with:
-          path: ~/ohos-sdk
-          key: ohos-sdk-5.0.0
+          path: ~/harmonyos-sdk
+          key: ohos-sdk-5.0.0-Release-v1
 
-      - name: Download HarmonyOS SDK
+      - name: Download and setup OpenHarmony SDK
         if: steps.cache-sdk.outputs.cache-hit != 'true'
         run: |
-          mkdir -p ~/ohos-sdk
-          cd ~/ohos-sdk
+          # 按照官方脚本重构
+          mkdir -p ~/harmonyos-sdk
+          cd ~/harmonyos-sdk
+
+          # 下载 SDK 压缩包
+          echo "=== Downloading SDK ==="
           wget -q https://repo.huaweicloud.com/harmonyos/os/5.0.0-Release/ohos-sdk-windows_linux-public.tar.gz
+
+          # 解压主压缩包
+          echo "=== Extracting main archive ==="
           tar -xzf ohos-sdk-windows_linux-public.tar.gz
           rm -f ohos-sdk-windows_linux-public.tar.gz
 
-      - name: Extract SDK components
-        if: steps.cache-sdk.outputs.cache-hit != 'true'
-        run: |
-          cd ~/ohos-sdk/linux
-          mkdir -p ../sdk
-          for zip in *.zip; do
-            echo "Extracting $zip..."
-            unzip -q "$zip" -d ../sdk/
-          done
-          echo "=== SDK extracted structure ==="
-          ls -la ~/ohos-sdk/sdk/
+          # 进入 linux 目录解压各组件
+          cd linux
+          echo "=== Extracting native ==="
+          unzip -q *native-linux-*.zip -d ./native
+          echo "=== Extracting toolchains ==="
+          unzip -q *toolchains-linux-*.zip -d ./toolchains
 
-      - name: Debug SDK structure
-        run: |
-          echo "=== SDK directory structure ==="
-          ls -la ~/ohos-sdk/
-          echo "=== linux directory ==="
-          ls -la ~/ohos-sdk/linux/
-          echo "=== Find all directories ==="
-          find ~/ohos-sdk/linux -maxdepth 5 -type d | head -50
+          # 清理 zip 文件
+          rm -f *.zip
 
-      - name: Setup HarmonyOS SDK environment
+      - name: Verify SDK structure
         run: |
-          # SDK 解压后的目录
-          SDK_PATH="$HOME/ohos-sdk/sdk"
-          if [ -d "$SDK_PATH" ]; then
-            echo "Using SDK path: $SDK_PATH"
-          else
-            SDK_PATH="$HOME/ohos-sdk"
-          fi
-          echo "HOS_SDK_HOME=$SDK_PATH" >> $GITHUB_ENV
-          echo "OHOS_BASE_SDK_HOME=$SDK_PATH" >> $GITHUB_ENV
-          # 列出 SDK 内容以验证
-          echo "=== SDK contents ==="
-          ls -la "$SDK_PATH" 2>/dev/null || echo "Path not accessible"
+          echo "=== SDK root ==="
+          ls -la ~/harmonyos-sdk/
+          echo "=== Linux directory ==="
+          ls -la ~/harmonyos-sdk/linux/ 2>/dev/null || echo "linux/ not found"
+          echo "=== Check native ==="
+          ls -la ~/harmonyos-sdk/linux/native/ 2>/dev/null || echo "native/ not found"
+          echo "=== Check toolchains ==="
+          ls -la ~/harmonyos-sdk/linux/toolchains/ 2>/dev/null || echo "toolchains/ not found"
+          echo "=== Check hdc ==="
+          ls -la ~/harmonyos-sdk/linux/toolchains/hdc 2>/dev/null || echo "hdc not found"
+          echo "=== Find hdc ==="
+          find ~/harmonyos-sdk -name "hdc" -type f 2>/dev/null
+
+      - name: Setup OpenHarmony SDK environment
+        run: |
+          echo "OHOS_SDK_HOME=$HOME/harmonyos-sdk" >> $GITHUB_ENV
+          echo "OHOS_BASE_SDK_HOME=$HOME/harmonyos-sdk" >> $GITHUB_ENV
+          echo "HOS_SDK_HOME=$HOME/harmonyos-sdk" >> $GITHUB_ENV
+          # 添加 hdc 到 PATH
+          echo "$HOME/harmonyos-sdk/linux/toolchains" >> $GITHUB_PATH
 
       - name: Setup Flutter SDK (OpenHarmony)
         run: |
           git clone --branch 3.35.8-ohos-1.0.3-beta --depth 1 https://gitcode.com/CPF-Flutter/flutter_flutter.git
           echo "$(pwd)/flutter_flutter/bin" >> $GITHUB_PATH
 
-      - name: Verify Flutter version
+      - name: Verify environment
         run: |
           flutter --version
           echo "---"
+          echo "OHOS_SDK_HOME=$OHOS_SDK_HOME"
           echo "HOS_SDK_HOME=$HOS_SDK_HOME"
-          ls -la $HOS_SDK_HOME 2>/dev/null || echo "SDK dir not found"
+          ls -la ~/harmonyos-sdk/linux/
+          which hdc 2>/dev/null && hdc --version 2>/dev/null || echo "hdc not in PATH yet"
 
       - name: Install dependencies
         working-directory: app
