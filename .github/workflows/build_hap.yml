@@ -47,8 +47,10 @@ jobs:
         run: |
           echo "=== SDK directory structure ==="
           ls -la ~/ohos-sdk/
-          echo "---"
-          find ~/ohos-sdk -maxdepth 3 -type d | head -50
+          echo "=== linux directory ==="
+          ls -la ~/ohos-sdk/linux/
+          echo "=== Find all directories ==="
+          find ~/ohos-sdk/linux -maxdepth 5 -type d | head -50
 
       - name: Setup HarmonyOS SDK environment
         run: |
