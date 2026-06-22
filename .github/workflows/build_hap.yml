@@ -22,7 +22,7 @@ jobs:
 
       - name: Setup Flutter SDK (OpenHarmony)
         run: |
-          git clone https://gitcode.com/CPF-Flutter/flutter_flutter.git --depth 1
+          git clone --branch 3.35.8-ohos-1.0.3-beta --depth 1 https://gitcode.com/CPF-Flutter/flutter_flutter.git
           echo "$(pwd)/flutter_flutter/bin" >> $GITHUB_PATH
 
       - name: Verify Flutter version
