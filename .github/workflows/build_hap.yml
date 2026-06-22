@@ -20,6 +20,27 @@ jobs:
         with:
           node-version: 22
 
+      - name: Cache HarmonyOS SDK
+        id: cache-sdk
+        uses: actions/cache@v4
+        with:
+          path: ~/ohos-sdk
+          key: ohos-sdk-5.0.3
+
+      - name: Download HarmonyOS SDK
+        if: steps.cache-sdk.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p ~/ohos-sdk
+          cd ~/ohos-sdk
+          wget -q https://repo.huaweicloud.com/harmonyos/os/5.0.3-Release/ohos-sdk-windows_linux-public.tar.gz
+          tar -xzf ohos-sdk-windows_linux-public.tar.gz
+          rm -f ohos-sdk-windows_linux-public.tar.gz
+
+      - name: Setup HarmonyOS SDK environment
+        run: |
+          echo "HOS_SDK_HOME=$HOME/ohos-sdk" >> $GITHUB_ENV
+          echo "$HOME/ohos-sdk" >> $GITHUB_PATH
+
       - name: Setup Flutter SDK (OpenHarmony)
         run: |
           git clone --branch 3.35.8-ohos-1.0.3-beta --depth 1 https://gitcode.com/CPF-Flutter/flutter_flutter.git
