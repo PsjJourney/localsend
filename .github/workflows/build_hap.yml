@@ -43,6 +43,18 @@ jobs:
           tar -xzf ohos-sdk-windows_linux-public.tar.gz
           rm -f ohos-sdk-windows_linux-public.tar.gz
 
+      - name: Extract SDK components
+        if: steps.cache-sdk.outputs.cache-hit != 'true'
+        run: |
+          cd ~/ohos-sdk/linux
+          mkdir -p ../sdk
+          for zip in *.zip; do
+            echo "Extracting $zip..."
+            unzip -q "$zip" -d ../sdk/
+          done
+          echo "=== SDK extracted structure ==="
+          ls -la ~/ohos-sdk/sdk/
+
       - name: Debug SDK structure
         run: |
           echo "=== SDK directory structure ==="
@@ -54,22 +66,17 @@ jobs:
 
       - name: Setup HarmonyOS SDK environment
         run: |
-          # 查找 SDK 实际路径 (OpenHarmony SDK 通常在 openharmony/<version> 或 HarmonyOS-Sdk/<version>)
-          SDK_PATH=$(find ~/ohos-sdk -type d -name "openharmony" 2>/dev/null | head -1)
-          if [ -z "$SDK_PATH" ]; then
-            SDK_PATH=$(find ~/ohos-sdk -type d -name "HarmonyOS-Sdk" 2>/dev/null | head -1)
-          fi
-          if [ -z "$SDK_PATH" ]; then
-            # 尝试找到包含 ets/js/native 的目录
-            SDK_PATH=$(find ~/ohos-sdk -type d -name "ets" -exec dirname {} \; 2>/dev/null | head -1)
-          fi
-          if [ -z "$SDK_PATH" ]; then
+          # SDK 解压后的目录
+          SDK_PATH="$HOME/ohos-sdk/sdk"
+          if [ -d "$SDK_PATH" ]; then
+            echo "Using SDK path: $SDK_PATH"
+          else
             SDK_PATH="$HOME/ohos-sdk"
           fi
-          echo "Detected SDK path: $SDK_PATH"
           echo "HOS_SDK_HOME=$SDK_PATH" >> $GITHUB_ENV
           echo "OHOS_BASE_SDK_HOME=$SDK_PATH" >> $GITHUB_ENV
           # 列出 SDK 内容以验证
+          echo "=== SDK contents ==="
           ls -la "$SDK_PATH" 2>/dev/null || echo "Path not accessible"
 
       - name: Setup Flutter SDK (OpenHarmony)
