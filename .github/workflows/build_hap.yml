@@ -52,13 +52,23 @@ jobs:
 
       - name: Setup HarmonyOS SDK environment
         run: |
-          # 查找 SDK 实际路径
-          SDK_PATH=$(find ~/ohos-sdk -maxdepth 2 -name "ohos-sdk" -type d 2>/dev/null | head -1)
+          # 查找 SDK 实际路径 (OpenHarmony SDK 通常在 openharmony/<version> 或 HarmonyOS-Sdk/<version>)
+          SDK_PATH=$(find ~/ohos-sdk -type d -name "openharmony" 2>/dev/null | head -1)
+          if [ -z "$SDK_PATH" ]; then
+            SDK_PATH=$(find ~/ohos-sdk -type d -name "HarmonyOS-Sdk" 2>/dev/null | head -1)
+          fi
+          if [ -z "$SDK_PATH" ]; then
+            # 尝试找到包含 ets/js/native 的目录
+            SDK_PATH=$(find ~/ohos-sdk -type d -name "ets" -exec dirname {} \; 2>/dev/null | head -1)
+          fi
           if [ -z "$SDK_PATH" ]; then
             SDK_PATH="$HOME/ohos-sdk"
           fi
+          echo "Detected SDK path: $SDK_PATH"
           echo "HOS_SDK_HOME=$SDK_PATH" >> $GITHUB_ENV
           echo "OHOS_BASE_SDK_HOME=$SDK_PATH" >> $GITHUB_ENV
+          # 列出 SDK 内容以验证
+          ls -la "$SDK_PATH" 2>/dev/null || echo "Path not accessible"
 
       - name: Setup Flutter SDK (OpenHarmony)
         run: |
