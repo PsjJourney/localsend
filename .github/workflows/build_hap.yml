@@ -32,16 +32,23 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/ohos-sdk
-          key: ohos-sdk-5.0.3
+          key: ohos-sdk-5.0.0
 
       - name: Download HarmonyOS SDK
         if: steps.cache-sdk.outputs.cache-hit != 'true'
         run: |
           mkdir -p ~/ohos-sdk
           cd ~/ohos-sdk
-          wget -q https://repo.huaweicloud.com/harmonyos/os/5.0.3-Release/ohos-sdk-windows_linux-public.tar.gz
+          wget -q https://repo.huaweicloud.com/harmonyos/os/5.0.0-Release/ohos-sdk-windows_linux-public.tar.gz
           tar -xzf ohos-sdk-windows_linux-public.tar.gz
           rm -f ohos-sdk-windows_linux-public.tar.gz
+
+      - name: Debug SDK structure
+        run: |
+          echo "=== SDK directory structure ==="
+          ls -la ~/ohos-sdk/
+          echo "---"
+          find ~/ohos-sdk -maxdepth 3 -type d | head -50
 
       - name: Setup HarmonyOS SDK environment
         run: |
