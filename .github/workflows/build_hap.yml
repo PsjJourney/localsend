@@ -27,65 +27,20 @@ jobs:
         with:
           node-version: 22
 
-      - name: Cache OpenHarmony SDK
-        id: cache-sdk
-        uses: actions/cache@v4
+      - name: Setup OpenHarmony SDK
+        id: setup-ohos-sdk
+        uses: openharmony-rs/setup-ohos-sdk@v1.0.0
         with:
-          path: ~/harmonyos-sdk
-          key: ohos-sdk-5.0.0-Release-v1
-
-      - name: Download and setup OpenHarmony SDK
-        if: steps.cache-sdk.outputs.cache-hit != 'true'
-        run: |
-          # 按照官方脚本重构
-          mkdir -p ~/harmonyos-sdk
-          cd ~/harmonyos-sdk
-
-          # 下载 SDK 压缩包
-          echo "=== Downloading SDK ==="
-          wget -q https://repo.huaweicloud.com/harmonyos/os/5.0.0-Release/ohos-sdk-windows_linux-public.tar.gz
-
-          # 解压主压缩包
-          echo "=== Extracting main archive ==="
-          tar -xzf ohos-sdk-windows_linux-public.tar.gz
-          rm -f ohos-sdk-windows_linux-public.tar.gz
-
-          # 进入 linux 目录解压各组件
-          cd linux
-          echo "=== Extracting native ==="
-          unzip -q *native-linux-*.zip -d ./native
-          echo "=== Extracting toolchains ==="
-          unzip -q *toolchains-linux-*.zip -d ./toolchains
-
-          # 清理 zip 文件
-          rm -f *.zip
-
-      - name: Verify SDK structure
-        run: |
-          echo "=== SDK root ==="
-          ls -la ~/harmonyos-sdk/
-          echo "=== Linux directory ==="
-          ls -la ~/harmonyos-sdk/linux/ 2>/dev/null || echo "linux/ not found"
-          echo "=== Check native ==="
-          ls -la ~/harmonyos-sdk/linux/native/ 2>/dev/null || echo "native/ not found"
-          echo "=== Check toolchains ==="
-          ls -la ~/harmonyos-sdk/linux/toolchains/ 2>/dev/null || echo "toolchains/ not found"
-          echo "=== Check hdc ==="
-          ls -la ~/harmonyos-sdk/linux/toolchains/hdc 2>/dev/null || echo "hdc not found"
-          echo "=== Find hdc ==="
-          find ~/harmonyos-sdk -name "hdc" -type f 2>/dev/null
+          version: '5.0.0'
+          cache: true
+          components: 'all'
 
       - name: Setup OpenHarmony SDK environment
         run: |
-          # 设置 SDK 根目录
-          echo "OHOS_SDK_HOME=$HOME/harmonyos-sdk/linux" >> $GITHUB_ENV
-          echo "OHOS_BASE_SDK_HOME=$HOME/harmonyos-sdk/linux" >> $GITHUB_ENV
-          echo "HOS_SDK_HOME=$HOME/harmonyos-sdk/linux" >> $GITHUB_ENV
-          # 添加 hdc 调试工具
-          echo "$HOME/harmonyos-sdk/linux/toolchains" >> $GITHUB_PATH
-          # 添加 Native 编译器 (clang, cmake等)
-          echo "$HOME/harmonyos-sdk/linux/native/build-tools/cmake/bin" >> $GITHUB_PATH
-          echo "$HOME/harmonyos-sdk/linux/native/llvm/bin" >> $GITHUB_PATH
+          # 设置 SDK 环境变量
+          echo "OHOS_SDK_HOME=${{ steps.setup-ohos-sdk.outputs.ohos_sdk_native }}" >> $GITHUB_ENV
+          echo "OHOS_BASE_SDK_HOME=${{ steps.setup-ohos-sdk.outputs.ohos_sdk_native }}" >> $GITHUB_ENV
+          echo "HOS_SDK_HOME=${{ steps.setup-ohos-sdk.outputs.ohos_sdk_native }}" >> $GITHUB_ENV
 
       - name: Setup Flutter SDK (OpenHarmony)
         run: |
