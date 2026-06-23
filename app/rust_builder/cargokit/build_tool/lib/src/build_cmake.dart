@@ -29,12 +29,50 @@ class BuildCMake {
     final artifacts = await provider.getArtifacts([target]);
 
     final libs = artifacts[target]!;
+    final copiedLibraries = <String>[];
 
     for (final lib in libs) {
       if (lib.type == AritifactType.dylib) {
         File(lib.path)
             .copySync(path.join(Environment.outputDir, lib.finalFileName));
+        copiedLibraries.add(lib.finalFileName);
       }
     }
+
+    if (copiedLibraries.isNotEmpty) {
+      return;
+    }
+
+    final outputDir = Directory(Environment.outputDir);
+    final outputListing = outputDir.existsSync()
+        ? outputDir
+            .listSync()
+            .map((entry) => path.basename(entry.path))
+            .toList()
+          ..sort()
+        : const <String>[];
+    final builtArtifactNames = libs.map((lib) => lib.finalFileName).toList()
+      ..sort();
+    final targetDir = path.join(
+      Environment.targetTempDir,
+      target.rust,
+      environment.configuration.rustName,
+    );
+    final targetListing = Directory(targetDir).existsSync()
+        ? Directory(targetDir)
+            .listSync()
+            .map((entry) => path.basename(entry.path))
+            .where((name) => name.contains(environment.crateInfo.packageName))
+            .toList()
+          ..sort()
+        : const <String>[];
+
+    throw Exception(
+      'Cargokit built no dynamic library for ${environment.crateInfo.packageName}.\n'
+      'Expected a file like lib${environment.crateInfo.packageName}.so in $targetDir.\n'
+      'Detected build artifacts: ${builtArtifactNames.isEmpty ? '(none)' : builtArtifactNames.join(', ')}\n'
+      'Target directory contents: ${targetListing.isEmpty ? '(none)' : targetListing.join(', ')}\n'
+      'Current CMake output directory contents: ${outputListing.isEmpty ? '(none)' : outputListing.join(', ')}',
+    );
   }
 }
