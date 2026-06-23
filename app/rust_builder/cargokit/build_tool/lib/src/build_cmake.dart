@@ -44,28 +44,35 @@ class BuildCMake {
     }
 
     final outputDir = Directory(Environment.outputDir);
-    final outputListing = outputDir.existsSync()
-        ? outputDir
-            .listSync()
-            .map((entry) => path.basename(entry.path))
-            .toList()
-          ..sort()
-        : const <String>[];
+    final outputListing = <String>[];
+    if (outputDir.existsSync()) {
+      outputListing.addAll(
+        outputDir.listSync().map((entry) => path.basename(entry.path)),
+      );
+      outputListing.sort();
+    }
     final builtArtifactNames = libs.map((lib) => lib.finalFileName).toList()
       ..sort();
+    final rustBuildDirName =
+        environment.configuration == BuildConfiguration.debug
+            ? 'debug'
+            : 'release';
     final targetDir = path.join(
       Environment.targetTempDir,
       target.rust,
-      environment.configuration.rustName,
+      rustBuildDirName,
     );
-    final targetListing = Directory(targetDir).existsSync()
-        ? Directory(targetDir)
+    final targetListing = <String>[];
+    final targetDirectory = Directory(targetDir);
+    if (targetDirectory.existsSync()) {
+      targetListing.addAll(
+        targetDirectory
             .listSync()
             .map((entry) => path.basename(entry.path))
-            .where((name) => name.contains(environment.crateInfo.packageName))
-            .toList()
-          ..sort()
-        : const <String>[];
+            .where((name) => name.contains(environment.crateInfo.packageName)),
+      );
+      targetListing.sort();
+    }
 
     throw Exception(
       'Cargokit built no dynamic library for ${environment.crateInfo.packageName}.\n'
