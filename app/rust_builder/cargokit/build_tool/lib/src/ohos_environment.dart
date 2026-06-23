@@ -37,6 +37,38 @@ class OhosEnvironment {
           Directory(path.join(candidate, 'sysroot')).existsSync();
     }
 
+    Iterable<String> nativeCandidatesForRoot(
+      String root,
+      String? hostDir,
+    ) sync* {
+      yield root;
+      yield path.join(root, 'native');
+      yield path.join(root, 'default', 'openharmony', 'native');
+      yield path.join(root, 'sdk', 'native');
+      yield path.join(root, 'sdk', 'default', 'openharmony', 'native');
+      if (hostDir != null) {
+        yield path.join(root, hostDir, 'native');
+        yield path.join(root, 'sdk', hostDir, 'native');
+      }
+
+      final directory = Directory(root);
+      if (!directory.existsSync()) {
+        return;
+      }
+
+      for (final entry in directory.listSync()) {
+        if (entry is! Directory) {
+          continue;
+        }
+        yield path.join(entry.path, 'native');
+        yield path.join(entry.path, 'openharmony', 'native');
+        yield path.join(entry.path, 'default', 'openharmony', 'native');
+        if (hostDir != null) {
+          yield path.join(entry.path, hostDir, 'native');
+        }
+      }
+    }
+
     void addCandidate(
       List<String> queue,
       String? candidate,
@@ -97,38 +129,6 @@ class OhosEnvironment {
       'windows' => 'windows',
       _ => null,
     };
-
-    Iterable<String> nativeCandidatesForRoot(
-      String root,
-      String? hostDir,
-    ) sync* {
-      yield root;
-      yield path.join(root, 'native');
-      yield path.join(root, 'default', 'openharmony', 'native');
-      yield path.join(root, 'sdk', 'native');
-      yield path.join(root, 'sdk', 'default', 'openharmony', 'native');
-      if (hostDir != null) {
-        yield path.join(root, hostDir, 'native');
-        yield path.join(root, 'sdk', hostDir, 'native');
-      }
-
-      final directory = Directory(root);
-      if (!directory.existsSync()) {
-        return;
-      }
-
-      for (final entry in directory.listSync()) {
-        if (entry is! Directory) {
-          continue;
-        }
-        yield path.join(entry.path, 'native');
-        yield path.join(entry.path, 'openharmony', 'native');
-        yield path.join(entry.path, 'default', 'openharmony', 'native');
-        if (hostDir != null) {
-          yield path.join(entry.path, hostDir, 'native');
-        }
-      }
-    }
 
     for (final key in _rootEnvKeys) {
       addRootCandidate(queue, Platform.environment[key], hostDir);
