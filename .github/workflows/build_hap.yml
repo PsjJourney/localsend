@@ -10,56 +10,22 @@ on:
 jobs:
   build-hap:
     runs-on: ubuntu-latest
+    container: ghcr.io/niuhuan/harmony-next-flutter-pipeline-docker/image:latest
     timeout-minutes: 120
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
 
-      - name: Setup Java 11
-        uses: actions/setup-java@v4
-        with:
-          java-version: '11'
-          distribution: 'temurin'
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: 22
-
-      - name: Setup OpenHarmony SDK
-        id: setup-ohos-sdk
-        uses: openharmony-rs/setup-ohos-sdk@v1.0.0
-        with:
-          version: '5.0.0'
-          cache: true
-          components: 'all'
-
-      - name: Setup OpenHarmony SDK environment
-        run: |
-          # setup-ohos-sdk 已设置 OHOS_BASE_SDK_HOME 和 OHOS_NDK_HOME
-          # Flutter 鸿蒙版需要 HOS_SDK_HOME
-          echo "HOS_SDK_HOME=$OHOS_BASE_SDK_HOME" >> $GITHUB_ENV
-          echo "OHOS_SDK_HOME=$OHOS_BASE_SDK_HOME" >> $GITHUB_ENV
-
-      - name: Setup Flutter SDK (OpenHarmony)
-        run: |
-          git clone --branch 3.35.8-ohos-1.0.3-beta --depth 1 https://gitcode.com/CPF-Flutter/flutter_flutter.git
-          echo "$(pwd)/flutter_flutter/bin" >> $GITHUB_PATH
-
       - name: Verify environment
         run: |
+          echo "=== Flutter version ==="
           flutter --version
           echo "---"
-          echo "OHOS_SDK_HOME=$OHOS_SDK_HOME"
-          echo "HOS_SDK_HOME=$HOS_SDK_HOME"
-          echo "---"
-          echo "=== Check hdc ==="
+          echo "=== OHOS_BASE_SDK_HOME ==="
+          echo "OHOS_BASE_SDK_HOME=$OHOS_BASE_SDK_HOME"
+          echo "=== HDC ==="
           which hdc 2>/dev/null && hdc --version 2>/dev/null || echo "hdc not in PATH"
-          echo "=== Check cmake ==="
-          which cmake 2>/dev/null && cmake --version 2>/dev/null | head -1 || echo "cmake not in PATH"
-          echo "=== Check clang ==="
-          which clang 2>/dev/null && clang --version 2>/dev/null | head -1 || echo "clang not in PATH"
 
       - name: Install dependencies
         working-directory: app
@@ -67,12 +33,18 @@ jobs:
 
       - name: Build HAP (Release)
         working-directory: app
-        run: flutter build hap --release
+        run: |
+          flutter build hap --target-platform=ohos-arm64 || true
+          cd ohos
+          hvigorw assembleHap --release
 
       - name: Find HAP file
         id: find-hap
         run: |
-          HAP_PATH=$(find app/build -name "*.hap" -type f 2>/dev/null | head -1)
+          HAP_PATH=$(find app -name "*.hap" -type f 2>/dev/null | head -1)
+          if [ -z "$HAP_PATH" ]; then
+            HAP_PATH=$(find . -name "*-signed.hap" -type f 2>/dev/null | head -1)
+          fi
           if [ -n "$HAP_PATH" ]; then
             echo "hap_path=$HAP_PATH" >> $GITHUB_OUTPUT
             echo "HAP found: $HAP_PATH"
