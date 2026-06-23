@@ -27,35 +27,6 @@ jobs:
           echo "=== HDC ==="
           which hdc 2>/dev/null && hdc --version 2>/dev/null || echo "hdc not in PATH"
 
-      - name: Resolve OHOS native SDK
-        run: |
-          NATIVE_DIR="${OHOS_SDK_NATIVE_DIR:-}"
-
-          if [ -z "$NATIVE_DIR" ]; then
-            for ROOT in "${OHOS_BASE_SDK_HOME:-}" "${OHOS_SDK_HOME:-}"; do
-              if [ -z "$ROOT" ] || [ ! -d "$ROOT" ]; then
-                continue
-              fi
-              if [ -x "$ROOT/llvm/bin/clang" ] && [ -d "$ROOT/sysroot" ]; then
-                NATIVE_DIR="$ROOT"
-                break
-              fi
-              CANDIDATE=$(find "$ROOT" -path '*/native/llvm/bin/clang' -type f | head -1 || true)
-              if [ -n "$CANDIDATE" ]; then
-                NATIVE_DIR=$(dirname "$(dirname "$(dirname "$CANDIDATE")")")
-                break
-              fi
-            done
-          fi
-
-          if [ -z "$NATIVE_DIR" ]; then
-            echo "Unable to locate OpenHarmony native SDK directory."
-            exit 1
-          fi
-
-          echo "Resolved OHOS_SDK_NATIVE_DIR=$NATIVE_DIR"
-          echo "OHOS_SDK_NATIVE_DIR=$NATIVE_DIR" >> "$GITHUB_ENV"
-
       - name: Install Rust toolchain
         run: |
           curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y

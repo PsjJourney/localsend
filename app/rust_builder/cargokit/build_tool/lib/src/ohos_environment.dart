@@ -50,6 +50,41 @@ class OhosEnvironment {
       }
     }
 
+    void addRootCandidate(
+      List<String> queue,
+      String? root,
+      String? hostDir,
+    ) {
+      if (root == null || root.isEmpty) {
+        return;
+      }
+      for (final candidate in nativeCandidatesForRoot(root, hostDir)) {
+        addCandidate(queue, candidate);
+      }
+    }
+
+    String? findExecutableOnPath(String executable) {
+      final pathEnv = Platform.environment['PATH'];
+      if (pathEnv == null || pathEnv.isEmpty) {
+        return null;
+      }
+      final executableNames = Platform.isWindows
+          ? [executable, '$executable.exe']
+          : [executable];
+      for (final dir in pathEnv.split(Platform.isWindows ? ';' : ':')) {
+        if (dir.isEmpty) {
+          continue;
+        }
+        for (final executableName in executableNames) {
+          final candidate = path.join(dir, executableName);
+          if (File(candidate).existsSync()) {
+            return candidate;
+          }
+        }
+      }
+      return null;
+    }
+
     final queue = <String>[];
 
     for (final key in _directEnvKeys) {
@@ -63,7 +98,10 @@ class OhosEnvironment {
       _ => null,
     };
 
-    Iterable<String> nativeCandidatesForRoot(String root) sync* {
+    Iterable<String> nativeCandidatesForRoot(
+      String root,
+      String? hostDir,
+    ) sync* {
       yield root;
       yield path.join(root, 'native');
       yield path.join(root, 'default', 'openharmony', 'native');
@@ -93,13 +131,30 @@ class OhosEnvironment {
     }
 
     for (final key in _rootEnvKeys) {
-      final root = Platform.environment[key];
-      if (root == null || root.isEmpty) {
-        continue;
+      addRootCandidate(queue, Platform.environment[key], hostDir);
+    }
+
+    final hdc = findExecutableOnPath('hdc');
+    if (hdc != null) {
+      final hdcDir = Directory(path.dirname(hdc));
+      final ancestors = <String>{
+        hdcDir.parent.parent.parent.path,
+        hdcDir.parent.parent.parent.parent.path,
+      };
+      for (final root in ancestors) {
+        addRootCandidate(queue, root, hostDir);
       }
-      for (final candidate in nativeCandidatesForRoot(root)) {
-        addCandidate(queue, candidate);
-      }
+    }
+
+    const fallbackRoots = [
+      '/opt/ohos-sdk',
+      '/opt/openharmony-sdk',
+      '/opt/harmonyos-sdk',
+      '/usr/local/ohos-sdk',
+      '/usr/local/openharmony-sdk',
+    ];
+    for (final root in fallbackRoots) {
+      addRootCandidate(queue, root, hostDir);
     }
 
     for (final candidate in queue) {
