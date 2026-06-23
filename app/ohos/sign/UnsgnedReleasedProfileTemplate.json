@@ -1,0 +1,22 @@
+{
+  "version-name": "1.0.0",
+  "version-code": 1000000,
+  "app-distribution-type": "os",
+  "uuid": "PLACEHOLDER_UUID",
+  "validity": {
+    "not-before": 1672502400,
+    "not-after": 4102444800
+  },
+  "keyalias": "debug",
+  "bundle-info": {
+    "developer-id": "PLACEHOLDER_DEVELOPER_ID",
+    "distribution-certificate": "PLACEHOLDER_CERTIFICATE",
+    "bundle-name": "com.localsend.localsend_app",
+    "apl": "normal",
+    "app-feature": "hos_normal_app"
+  },
+  "permissions": {
+    "restricted-permissions": []
+  },
+  "issuer": "os"
+}
