@@ -41,6 +41,7 @@ jobs:
           . "$HOME/.cargo/env"
           flutter pub get
           dart run tool/fix_ohos_plugin_hvigor.dart
+          node ohos/ensure-ohos-plugins.js .
 
       - name: Build HAP (Release)
         working-directory: app

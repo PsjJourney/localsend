@@ -31,6 +31,7 @@ echo
 
 echo "==> normalize OHOS plugin hvigor files"
 dart run tool/fix_ohos_plugin_hvigor.dart
+node ohos/ensure-ohos-plugins.js .
 echo
 
 echo "==> flutter build hap --release"

@@ -37,6 +37,7 @@ flutter pub get
 echo
 echo "==> Normalizing OHOS plugin hvigor files"
 dart run tool/fix_ohos_plugin_hvigor.dart
+node ohos/ensure-ohos-plugins.js .
 
 echo
 echo "==> Building HarmonyOS HAP"
