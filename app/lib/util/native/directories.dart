@@ -10,6 +10,9 @@ Future<String> getDefaultDestinationDirectory() async {
       return dir?.path ?? '/storage/emulated/0/Download';
     case TargetPlatform.iOS:
       return (await path.getApplicationDocumentsDirectory()).path;
+    case TargetPlatform.ohos:
+      final dir = await path.getDownloadsDirectory();
+      return dir?.path ?? (await path.getApplicationDocumentsDirectory()).path;
     case TargetPlatform.linux:
     case TargetPlatform.macOS:
     case TargetPlatform.windows:

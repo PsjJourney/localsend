@@ -13,6 +13,8 @@ extension TargetPlatformExt on TargetPlatform {
         return 'Linux';
       case TargetPlatform.macOS:
         return 'macOS';
+      case TargetPlatform.ohos:
+        return 'HarmonyOS';
       case TargetPlatform.windows:
         return 'Windows';
     }

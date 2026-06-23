@@ -44,6 +44,7 @@ Terminal=false
           ),
         );
         return true;
+      case TargetPlatform.ohos:
       default:
         return false;
     }
@@ -66,6 +67,7 @@ Future<bool> disableAutoStart() async {
       case TargetPlatform.windows:
         _getWindowsRegistryKey().deleteValue(_windowsRegistryKeyValue);
         break;
+      case TargetPlatform.ohos:
       default:
         break;
     }
@@ -85,6 +87,7 @@ Future<bool> isAutoStartEnabled() async {
       return await getLaunchAtLogin();
     case TargetPlatform.windows:
       return _getWindowsRegistryKey().getValueAsString(_windowsRegistryKeyValue)?.contains(Platform.resolvedExecutable) ?? false;
+    case TargetPlatform.ohos:
     default:
       return false;
   }
@@ -103,6 +106,7 @@ Future<bool> isAutoStartHidden() async {
       return await getLaunchAtLoginMinimized();
     case TargetPlatform.windows:
       return _getWindowsRegistryKey().getValueAsString(_windowsRegistryKeyValue)?.contains(startHiddenFlag) ?? false;
+    case TargetPlatform.ohos:
     default:
       return false;
   }

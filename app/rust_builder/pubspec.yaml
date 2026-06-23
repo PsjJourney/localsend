@@ -24,6 +24,8 @@ flutter:
     platforms:
       android:
         ffiPlugin: true
+      ohos:
+        ffiPlugin: true
       ios:
         ffiPlugin: true
       linux:

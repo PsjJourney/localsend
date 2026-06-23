@@ -40,6 +40,7 @@ Future<bool> disableContextMenu() async {
           await file.delete();
         }
         return true;
+      case TargetPlatform.ohos:
       default:
         return false;
     }
@@ -52,6 +53,7 @@ Future<bool> isContextMenuEnabled() async {
   switch (defaultTargetPlatform) {
     case TargetPlatform.windows:
       return await File(_getWindowsFilePath(_windowsFileName)).exists();
+    case TargetPlatform.ohos:
     default:
       return false;
   }

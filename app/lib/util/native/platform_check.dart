@@ -24,23 +24,23 @@ bool checkPlatformHasTray() {
 
 /// This platform can receive share intents
 bool checkPlatformCanReceiveShareIntent() {
-  return checkPlatform([TargetPlatform.android, TargetPlatform.iOS]);
+  return checkPlatform([TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.ohos]);
 }
 
 /// This platform can select folders
 bool checkPlatformWithFolderSelect() {
-  return checkPlatform([TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.linux, TargetPlatform.windows, TargetPlatform.macOS]);
+  return checkPlatform([TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.ohos, TargetPlatform.linux, TargetPlatform.windows, TargetPlatform.macOS]);
 }
 
 /// This platform has a gallery
 bool checkPlatformWithGallery() {
-  return checkPlatform([TargetPlatform.android, TargetPlatform.iOS]);
+  return checkPlatform([TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.ohos]);
 }
 
 /// This platform has access to file system
 /// On android, do not allow to change
 bool checkPlatformWithFileSystem() {
-  return checkPlatform([TargetPlatform.linux, TargetPlatform.windows, TargetPlatform.android, TargetPlatform.macOS]);
+  return checkPlatform([TargetPlatform.linux, TargetPlatform.windows, TargetPlatform.android, TargetPlatform.ohos, TargetPlatform.macOS]);
 }
 
 /// Convenience function to check if the app is not running on a Linux device with the Wayland display manager

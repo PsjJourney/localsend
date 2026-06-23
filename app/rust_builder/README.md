@@ -1,1 +1,1 @@
-Please ignore this folder, which is just glue to build Rust with Flutter.
+This folder contains the Flutter plugin glue used to build and bundle the Rust core on each supported platform, including HarmonyOS/OpenHarmony.

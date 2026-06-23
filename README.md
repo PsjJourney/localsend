@@ -38,6 +38,7 @@ LocalSend is a free, open-source app that allows you to securely share files and
   - [macOS](#macos)
   - [Windows](#windows)
   - [Linux](#linux)
+  - [HarmonyOS / OpenHarmony](#harmonyos--openharmony)
 
 ## About
 
@@ -255,6 +256,30 @@ appimage-builder --recipe AppImageBuilder.yml
 **Snap**
 
 Instructions in [localsend/snap/README.md](https://github.com/localsend/snap/blob/main/README.md)
+
+### HarmonyOS / OpenHarmony
+
+HarmonyOS support requires an OHOS-enabled Flutter SDK and a local HarmonyOS/OpenHarmony SDK installation.
+
+Expected prerequisites:
+
+```bash
+export FLUTTER_ROOT=/path/to/flutter_flutter
+export OHOS_SDK_HOME=/path/to/ohos-sdk
+export PATH="$FLUTTER_ROOT/bin:$PATH"
+```
+
+Then build from the repository root:
+
+```bash
+./build_ohos.sh
+```
+
+Notes:
+
+- The `app/ohos` directory is checked in as a base template.
+- OHOS plugin modules and HAR overrides are injected by the Flutter OHOS toolchain during build.
+- The Flutter OHOS fork must be new enough to satisfy this project's Dart/Flutter constraints. Older forks such as Dart 2.x or early Dart 3.6-based distributions will not resolve this app's dependencies.
 
 ## Contributors
 

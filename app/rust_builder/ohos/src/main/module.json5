@@ -1,0 +1,10 @@
+{
+  "module": {
+    "name": "rust_lib_localsend_app",
+    "type": "har",
+    "deviceTypes": [
+      "default",
+      "tablet"
+    ]
+  }
+}
