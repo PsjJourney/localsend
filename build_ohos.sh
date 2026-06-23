@@ -29,6 +29,10 @@ echo "==> Resolving Dart and Flutter packages"
 flutter pub get
 
 echo
+echo "==> Normalizing OHOS plugin hvigor files"
+dart run tool/fix_ohos_plugin_hvigor.dart
+
+echo
 echo "==> Building HarmonyOS HAP"
 flutter build hap --release
 

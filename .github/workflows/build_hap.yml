@@ -29,7 +29,9 @@ jobs:
 
       - name: Install dependencies
         working-directory: app
-        run: flutter pub get
+        run: |
+          flutter pub get
+          dart run tool/fix_ohos_plugin_hvigor.dart
 
       - name: Build HAP (Release)
         working-directory: app

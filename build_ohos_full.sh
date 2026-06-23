@@ -23,6 +23,10 @@ echo "==> flutter pub get"
 flutter pub get
 echo
 
+echo "==> normalize OHOS plugin hvigor files"
+dart run tool/fix_ohos_plugin_hvigor.dart
+echo
+
 echo "==> flutter build hap --release"
 flutter build hap --release
 echo

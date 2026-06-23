@@ -19,4 +19,5 @@ rm -f "$FLUTTER_ROOT/bin/cache/shlock"* 2>/dev/null || true
 rm -f "$FLUTTER_ROOT/bin/cache/lockfile" 2>/dev/null || true
 
 flutter pub get
+dart run tool/fix_ohos_plugin_hvigor.dart
 flutter build hap --release
