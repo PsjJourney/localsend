@@ -34,9 +34,7 @@ jobs:
       - name: Build HAP (Release)
         working-directory: app
         run: |
-          flutter build hap --target-platform=ohos-arm64 || true
-          cd ohos
-          hvigorw assembleHap --release
+          flutter build hap --release --target-platform=ohos-arm64
 
       - name: Find HAP file
         id: find-hap
