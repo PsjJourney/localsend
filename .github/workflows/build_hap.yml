@@ -43,6 +43,12 @@ jobs:
           dart run tool/fix_ohos_plugin_hvigor.dart
           node ohos/ensure-ohos-plugins.js .
 
+      - name: Diagnose OHOS Rust build
+        working-directory: app
+        run: |
+          . "$HOME/.cargo/env"
+          bash tool/diagnose_ohos_rust_build.sh
+
       - name: Build HAP (Release)
         working-directory: app
         run: |
