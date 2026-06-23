@@ -59,6 +59,18 @@ class Target {
       flutter: 'linux-arm64',
     ),
     Target(
+      rust: 'armv7-unknown-linux-ohos',
+      flutter: 'ohos-arm',
+    ),
+    Target(
+      rust: 'aarch64-unknown-linux-ohos',
+      flutter: 'ohos-arm64',
+    ),
+    Target(
+      rust: 'x86_64-unknown-linux-ohos',
+      flutter: 'ohos-x64',
+    ),
+    Target(
       rust: 'x86_64-apple-darwin',
       darwinPlatform: 'macosx',
       darwinArch: 'x86_64',
@@ -141,4 +153,6 @@ class Target {
   final int? androidMinSdkVersion;
   final String? darwinPlatform;
   final String? darwinArch;
+
+  bool get isOhos => rust.endsWith('-linux-ohos');
 }

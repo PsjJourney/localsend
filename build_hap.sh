@@ -13,6 +13,12 @@ fi
 
 export PATH="$FLUTTER_ROOT/bin:$PATH"
 
+"$ROOT_DIR/prepare_ohos_rust.sh"
+if [ -f "$HOME/.cargo/env" ]; then
+  # shellcheck disable=SC1090
+  . "$HOME/.cargo/env"
+fi
+
 cd "$APP_DIR"
 
 rm -f "$FLUTTER_ROOT/bin/cache/shlock"* 2>/dev/null || true

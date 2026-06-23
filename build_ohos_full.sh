@@ -13,6 +13,12 @@ fi
 
 export PATH="$FLUTTER_ROOT/bin:$PATH"
 
+"$ROOT_DIR/prepare_ohos_rust.sh"
+if [ -f "$HOME/.cargo/env" ]; then
+  # shellcheck disable=SC1090
+  . "$HOME/.cargo/env"
+fi
+
 cd "$APP_DIR"
 
 echo "==> Flutter SDK"

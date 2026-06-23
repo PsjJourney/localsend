@@ -8,6 +8,7 @@ import 'package:path/path.dart' as path;
 import 'android_environment.dart';
 import 'cargo.dart';
 import 'environment.dart';
+import 'ohos_environment.dart';
 import 'options.dart';
 import 'rustup.dart';
 import 'target.dart';
@@ -167,7 +168,21 @@ class RustBuilder {
   }
 
   Future<Map<String, String>> _buildEnvironment() async {
-    if (target.android == null) {
+    if (target.isOhos) {
+      final sdkNativeDir = OhosEnvironment.locateNativeDir();
+      if (sdkNativeDir == null) {
+        throw BuildException(
+          'Unable to locate an OpenHarmony native SDK. '
+          'Set OHOS_SDK_NATIVE_DIR, or point OHOS_BASE_SDK_HOME/OHOS_SDK_HOME to an SDK root that contains native/llvm/bin/clang.',
+        );
+      }
+      final env = OhosEnvironment(
+        sdkNativeDir: sdkNativeDir,
+        targetTempDir: environment.targetTempDir,
+        target: target,
+      );
+      return env.buildEnvironment();
+    } else if (target.android == null) {
       return {};
     } else {
       final sdkPath = environment.androidSdkPath;
